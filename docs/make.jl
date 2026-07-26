@@ -1,7 +1,12 @@
-using TaggedSerde
+using TypeAgnosticSerialisation
 using Documenter
 
-DocMeta.setdocmeta!(TaggedSerde, :DocTestSetup, :(using TaggedSerde); recursive = true)
+DocMeta.setdocmeta!(
+    TypeAgnosticSerialisation,
+    :DocTestSetup,
+    :(using TypeAgnosticSerialisation);
+    recursive = true,
+)
 
 # Add titles of sections and overrides page titles
 const titles = Dict(
@@ -59,12 +64,14 @@ function list_pages()
 end
 
 makedocs(;
-    modules = [TaggedSerde],
+    modules = [TypeAgnosticSerialisation],
     authors = "Daniel Celis Garza <daniel.celis.garza@gmail.com>",
-    repo = "https://github.com/dcelisgarza/TaggedSerde.jl/blob/{commit}{path}#{line}",
-    sitename = "TaggedSerde.jl",
-    format = Documenter.HTML(; canonical = "https://dcelisgarza.github.io/TaggedSerde.jl"),
+    repo = "https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/blob/{commit}{path}#{line}",
+    sitename = "TypeAgnosticSerialisation.jl",
+    format = Documenter.HTML(;
+        canonical = "https://dcelisgarza.github.io/TypeAgnosticSerialisation.jl",
+    ),
     pages = list_pages(),
 )
 
-deploydocs(; repo = "github.com/dcelisgarza/TaggedSerde.jl")
+deploydocs(; repo = "github.com/dcelisgarza/TypeAgnosticSerialisation.jl")

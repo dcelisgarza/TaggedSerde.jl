@@ -1,14 +1,14 @@
-# TaggedSerde
+# TypeAgnosticSerialisation
 
-[![Stable Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://dcelisgarza.github.io/TaggedSerde.jl/stable)
-[![Development documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://dcelisgarza.github.io/TaggedSerde.jl/dev)
-[![Test workflow status](https://github.com/dcelisgarza/TaggedSerde.jl/actions/workflows/Test.yml/badge.svg?branch=main)](https://github.com/dcelisgarza/TaggedSerde.jl/actions/workflows/Test.yml?query=branch%3Amain)
-[![Coverage](https://codecov.io/gh/dcelisgarza/TaggedSerde.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/dcelisgarza/TaggedSerde.jl)
-[![Lint workflow Status](https://github.com/dcelisgarza/TaggedSerde.jl/actions/workflows/Lint.yml/badge.svg?branch=main)](https://github.com/dcelisgarza/TaggedSerde.jl/actions/workflows/Lint.yml?query=branch%3Amain)
-[![Docs workflow Status](https://github.com/dcelisgarza/TaggedSerde.jl/actions/workflows/Docs.yml/badge.svg?branch=main)](https://github.com/dcelisgarza/TaggedSerde.jl/actions/workflows/Docs.yml?query=branch%3Amain)
+[![Stable Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://dcelisgarza.github.io/TypeAgnosticSerialisation.jl/stable)
+[![Development documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://dcelisgarza.github.io/TypeAgnosticSerialisation.jl/dev)
+[![Test workflow status](https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/actions/workflows/Test.yml/badge.svg?branch=main)](https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/actions/workflows/Test.yml?query=branch%3Amain)
+[![Coverage](https://codecov.io/gh/dcelisgarza/TypeAgnosticSerialisation.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/dcelisgarza/TypeAgnosticSerialisation.jl)
+[![Lint workflow Status](https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/actions/workflows/Lint.yml/badge.svg?branch=main)](https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/actions/workflows/Lint.yml?query=branch%3Amain)
+[![Docs workflow Status](https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/actions/workflows/Docs.yml/badge.svg?branch=main)](https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/actions/workflows/Docs.yml?query=branch%3Amain)
 [![BestieTemplate](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/JuliaBesties/BestieTemplate.jl/main/docs/src/assets/badge.json)](https://github.com/JuliaBesties/BestieTemplate.jl)
 
-**TaggedSerde** serialises an arbitrary Julia value to JSON and reconstructs it later
+**TypeAgnosticSerialisation** serialises an arbitrary Julia value to JSON and reconstructs it later
 *without knowing its type up front*. The JSON carries enough type metadata — the full
 concrete type, including type parameters, recursively — to rebuild the exact concrete type
 tree. That is what lets a field declared `::AbstractShape` come back as the precise
@@ -22,7 +22,7 @@ document.
 
 ```julia
 using Pkg
-Pkg.add("TaggedSerde")
+Pkg.add("TypeAgnosticSerialisation")
 ```
 
 ## A worked example
@@ -35,7 +35,7 @@ stand-in for a live, non-data object. `Scene` ties them together, holding a hete
 `using .Shapes`:
 
 ```julia
-julia> using TaggedSerde
+julia> using TypeAgnosticSerialisation
 
 julia> module Shapes
            export AbstractShape, Circle, Rect, Square, Color, red, green, blue, Scene, Handle, Doc

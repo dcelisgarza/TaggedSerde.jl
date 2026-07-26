@@ -10,22 +10,22 @@
 #   * drop the Documenter `@meta` block(s),
 #   * turn ```jldoctest fences into plain ```julia,
 #   * flatten `[text](@ref …)` cross-references to just `text`,
-#   * insert the badges beneath the `# TaggedSerde` heading.
+#   * insert the badges beneath the `# TypeAgnosticSerialisation` heading.
 #
 # Run it with `julia --project=docs docs/generate_readme.jl`. The pure `readme_string`
 # function is also `include`d by the test suite, which asserts the committed README matches
 # what this script would produce — so a stale README fails CI.
 
 const BADGES = """
-[![Stable Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://dcelisgarza.github.io/TaggedSerde.jl/stable)
-[![Development documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://dcelisgarza.github.io/TaggedSerde.jl/dev)
-[![Test workflow status](https://github.com/dcelisgarza/TaggedSerde.jl/actions/workflows/Test.yml/badge.svg?branch=main)](https://github.com/dcelisgarza/TaggedSerde.jl/actions/workflows/Test.yml?query=branch%3Amain)
-[![Coverage](https://codecov.io/gh/dcelisgarza/TaggedSerde.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/dcelisgarza/TaggedSerde.jl)
-[![Lint workflow Status](https://github.com/dcelisgarza/TaggedSerde.jl/actions/workflows/Lint.yml/badge.svg?branch=main)](https://github.com/dcelisgarza/TaggedSerde.jl/actions/workflows/Lint.yml?query=branch%3Amain)
-[![Docs workflow Status](https://github.com/dcelisgarza/TaggedSerde.jl/actions/workflows/Docs.yml/badge.svg?branch=main)](https://github.com/dcelisgarza/TaggedSerde.jl/actions/workflows/Docs.yml?query=branch%3Amain)
+[![Stable Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://dcelisgarza.github.io/TypeAgnosticSerialisation.jl/stable)
+[![Development documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://dcelisgarza.github.io/TypeAgnosticSerialisation.jl/dev)
+[![Test workflow status](https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/actions/workflows/Test.yml/badge.svg?branch=main)](https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/actions/workflows/Test.yml?query=branch%3Amain)
+[![Coverage](https://codecov.io/gh/dcelisgarza/TypeAgnosticSerialisation.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/dcelisgarza/TypeAgnosticSerialisation.jl)
+[![Lint workflow Status](https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/actions/workflows/Lint.yml/badge.svg?branch=main)](https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/actions/workflows/Lint.yml?query=branch%3Amain)
+[![Docs workflow Status](https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/actions/workflows/Docs.yml/badge.svg?branch=main)](https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/actions/workflows/Docs.yml?query=branch%3Amain)
 [![BestieTemplate](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/JuliaBesties/BestieTemplate.jl/main/docs/src/assets/badge.json)](https://github.com/JuliaBesties/BestieTemplate.jl)"""
 
-const _TITLE = "# TaggedSerde"
+const _TITLE = "# TypeAgnosticSerialisation"
 
 """
     readme_string(index_md::AbstractString) -> String

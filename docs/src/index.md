@@ -1,10 +1,10 @@
 ```@meta
-CurrentModule = TaggedSerde
+CurrentModule = TypeAgnosticSerialisation
 ```
 
-# TaggedSerde
+# TypeAgnosticSerialisation
 
-**TaggedSerde** serialises an arbitrary Julia value to JSON and reconstructs it later
+**TypeAgnosticSerialisation** serialises an arbitrary Julia value to JSON and reconstructs it later
 *without knowing its type up front*. The JSON carries enough type metadata — the full
 concrete type, including type parameters, recursively — to rebuild the exact concrete type
 tree. That is what lets a field declared `::AbstractShape` come back as the precise
@@ -18,7 +18,7 @@ document.
 
 ```julia
 using Pkg
-Pkg.add("TaggedSerde")
+Pkg.add("TypeAgnosticSerialisation")
 ```
 
 ## A worked example
@@ -31,7 +31,7 @@ stand-in for a live, non-data object. `Scene` ties them together, holding a hete
 `using .Shapes`:
 
 ```jldoctest shapes
-julia> using TaggedSerde
+julia> using TypeAgnosticSerialisation
 
 julia> module Shapes
            export AbstractShape, Circle, Rect, Square, Color, red, green, blue, Scene, Handle, Doc

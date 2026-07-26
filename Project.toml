@@ -1,4 +1,4 @@
-name = "TaggedSerde"
+name = "TypeAgnosticSerialisation"
 uuid = "711d1e8a-e0c5-5f25-919c-2a5a262959e5"
 version = "0.1.0"
 authors = ["Daniel Celis Garza <daniel.celis.garza@gmail.com>"]

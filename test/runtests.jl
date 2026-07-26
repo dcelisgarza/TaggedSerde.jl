@@ -1,4 +1,4 @@
-using TaggedSerde
+using TypeAgnosticSerialisation
 using Test
 
 #=

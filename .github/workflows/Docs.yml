@@ -37,9 +37,9 @@ jobs:
         run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
-            using TaggedSerde
-            DocMeta.setdocmeta!(TaggedSerde, :DocTestSetup, :(using TaggedSerde); recursive=true)
-            doctest(TaggedSerde)'
+            using TypeAgnosticSerialisation
+            DocMeta.setdocmeta!(TypeAgnosticSerialisation, :DocTestSetup, :(using TypeAgnosticSerialisation); recursive=true)
+            doctest(TypeAgnosticSerialisation)'
       - name: Generate and deploy documentation
         run: julia --project=docs docs/make.jl
         env:

@@ -1,4 +1,4 @@
-# TaggedSerde — type-tagged (de)serialisation of arbitrary Julia values.
+# TypeAgnosticSerialisation — type-tagged (de)serialisation of arbitrary Julia values.
 #
 # Goal: serialise a Julia value to JSON and reconstruct it later *without* knowing
 # its type up front. The JSON carries enough type metadata to rebuild the exact
@@ -46,7 +46,7 @@
 # "names"/"values" (named tuples). A struct field literally named "__type__" would
 # collide — documented limitation.
 
-module TaggedSerde
+module TypeAgnosticSerialisation
 
 using JSON: JSON   # only used by to_json/from_json; core encode/decode need no deps
 
@@ -114,7 +114,7 @@ function _construct_opaque(@nospecialize(T))
         return T()
     catch
         error(
-            "TaggedSerde: opaque type $(T) has no no-argument constructor; " *
+            "TypeAgnosticSerialisation: opaque type $(T) has no no-argument constructor; " *
             "it cannot be rebuilt on decode.",
         )
     end
@@ -143,7 +143,7 @@ function _type_desc(@nospecialize(T), ctx::SerdeContext)
         # resolves back through the allowlist by name with no parameters.
         if !(T === getfield(parentmodule(T), nameof(T)))
             error(
-                "TaggedSerde: partially-applied UnionAll $(T) is unsupported. " *
+                "TypeAgnosticSerialisation: partially-applied UnionAll $(T) is unsupported. " *
                 "If it lives inside a live / non-data object (e.g. a solver model), " *
                 "mark that object's type opaque, e.g. opaque = (JuMP.Model,).",
             )
@@ -163,7 +163,7 @@ function _type_desc(@nospecialize(T), ctx::SerdeContext)
         # UnionAll / Union type parameters (e.g. Vector{Vector}) are an extension
         # point — the estimator use case has fully concrete parameters.
         error(
-            "TaggedSerde: unsupported non-concrete type parameter $(T)::$(typeof(T)). " *
+            "TypeAgnosticSerialisation: unsupported non-concrete type parameter $(T)::$(typeof(T)). " *
             "Add a rule in _type_desc/_resolve_type if you need it.",
         )
     end
@@ -181,14 +181,16 @@ function _lookup_module(modname::AbstractString, ctx::SerdeContext)
         for p in parts[2:end]
             sym = Symbol(p)
             if !(isdefined(m, sym) && getfield(m, sym) isa Module)
-                error("TaggedSerde: module $(modname) is not in the allowlist.")
+                error(
+                    "TypeAgnosticSerialisation: module $(modname) is not in the allowlist.",
+                )
             end
             m = getfield(m, sym)
         end
         return m
     end
     return error(
-        "TaggedSerde: module $(modname) is not in the allowlist. " *
+        "TypeAgnosticSerialisation: module $(modname) is not in the allowlist. " *
         "Pass it via SerdeContext(modules = (…, $(modname), …)).",
     )
 end
@@ -208,11 +210,13 @@ function _resolve_type(desc, ctx::SerdeContext)
     mod = _lookup_module(desc["module"], ctx)
     sym = Symbol(desc["name"])
     if !(isdefined(mod, sym))
-        error("TaggedSerde: $(desc["module"]).$(desc["name"]) is not defined.")
+        error(
+            "TypeAgnosticSerialisation: $(desc["module"]).$(desc["name"]) is not defined.",
+        )
     end
     base = getfield(mod, sym)
     if !(base isa Type)
-        error("TaggedSerde: $(desc["module"]).$(desc["name"]) is not a type.")
+        error("TypeAgnosticSerialisation: $(desc["module"]).$(desc["name"]) is not a type.")
     end
     params = Any[_resolve_param(p, ctx) for p in desc["params"]]
     if !isempty(params)
@@ -245,7 +249,7 @@ end
 # Generated: `new(T, fields[1], …, fields[n])`. `T` here is the static parameter.
 @generated function _new_impl(::Type{T}, fields) where {T}
     if !isconcretetype(T)
-        return :(error("TaggedSerde: cannot build non-concrete type $(T)."))
+        return :(error("TypeAgnosticSerialisation: cannot build non-concrete type $(T)."))
     end
     return Expr(:new, :T, (:(fields[$i]) for i = 1:fieldcount(T))...)
 end
@@ -253,7 +257,7 @@ end
 function _newbuild(@nospecialize(T::DataType), fields::Vector{Any})
     n = fieldcount(T)
     if !(n == length(fields))
-        error("TaggedSerde: $(T) expects $(n) fields, got $(length(fields)).")
+        error("TypeAgnosticSerialisation: $(T) expects $(n) fields, got $(length(fields)).")
     end
     return _new_impl(T, fields)
 end
@@ -272,7 +276,7 @@ function _construct_safe(@nospecialize(T::DataType), fields::Vector{Any})
         catch e_kw
             flist = join(fieldnames(T), ", ")
             error(
-                "TaggedSerde (validate): could not reconstruct $(T) through a " *
+                "TypeAgnosticSerialisation (validate): could not reconstruct $(T) through a " *
                 "constructor. Tried `$(nameof(T))(fields...)` → " *
                 "$(sprint(showerror, e_pos)); and `$(nameof(T))(; $(flist)...)` → " *
                 "$(sprint(showerror, e_kw)). Mark the type opaque or use " *
@@ -387,7 +391,7 @@ function _encode_plain(@nospecialize(v), @nospecialize(T), ctx::SerdeContext)
         for i = 1:fieldcount(T)
             if !(isdefined(v, i))
                 error(
-                    "TaggedSerde: field $(fieldname(T, i)) of $(T) is undefined; " *
+                    "TypeAgnosticSerialisation: field $(fieldname(T, i)) of $(T) is undefined; " *
                     "#undef fields are not supported.",
                 )
             end
@@ -395,7 +399,7 @@ function _encode_plain(@nospecialize(v), @nospecialize(T), ctx::SerdeContext)
         end
         return d
     else
-        error("TaggedSerde: don't know how to encode a value of type $(T).")
+        error("TypeAgnosticSerialisation: don't know how to encode a value of type $(T).")
     end
 end
 
@@ -448,7 +452,7 @@ function decode(tree, @nospecialize(H), ctx::SerdeContext)
     else
         if !(isconcretetype(H))
             error(
-                "TaggedSerde: expected a tagged value but got an untagged one with " *
+                "TypeAgnosticSerialisation: expected a tagged value but got an untagged one with " *
                 "abstract hint $(H).",
             )
         end
@@ -466,7 +470,7 @@ function _decode_plain(payload, @nospecialize(T), ctx::SerdeContext)
         sym = Symbol(payload)
         idx = findfirst(e -> Symbol(e) == sym, instances(T))
         if idx === nothing
-            error("TaggedSerde: $(sym) is not a member of $(T).")
+            error("TypeAgnosticSerialisation: $(sym) is not a member of $(T).")
         end
         return instances(T)[idx]
     elseif T === Bool
@@ -510,7 +514,7 @@ function _decode_plain(payload, @nospecialize(T), ctx::SerdeContext)
         ]
         return ctx.validate ? _construct_safe(T, fields) : _newbuild(T, fields)
     else
-        error("TaggedSerde: don't know how to decode into type $(T).")
+        error("TypeAgnosticSerialisation: don't know how to decode into type $(T).")
     end
 end
 

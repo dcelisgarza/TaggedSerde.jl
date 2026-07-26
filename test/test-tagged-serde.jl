@@ -1,5 +1,6 @@
-using TaggedSerde
-using TaggedSerde: SerdeContext, encode, decode, to_json, from_json, from_json_direct
+using TypeAgnosticSerialisation
+using TypeAgnosticSerialisation:
+    SerdeContext, encode, decode, to_json, from_json, from_json_direct
 using Test
 import TOML
 
@@ -214,7 +215,11 @@ end
     end
     # A tag naming a non-existent member is refused.
     ctx = SerdeContext((M,))
-    @test_throws ErrorException TaggedSerde._decode_plain("not_a_color", Color, ctx)
+    @test_throws ErrorException TypeAgnosticSerialisation._decode_plain(
+        "not_a_color",
+        Color,
+        ctx,
+    )
 end
 
 @testset "type values round-trip" begin
@@ -234,9 +239,12 @@ end
 @testset "type-descriptor errors" begin
     ctx = SerdeContext((M,))
     # Partially-applied UnionAll is unsupported.
-    @test_throws ErrorException TaggedSerde._type_desc(Array{Float64}, ctx)
+    @test_throws ErrorException TypeAgnosticSerialisation._type_desc(Array{Float64}, ctx)
     # A Union used as a type parameter is a non-concrete parameter.
-    @test_throws ErrorException TaggedSerde._type_desc(Union{Int,Float64}, ctx)
+    @test_throws ErrorException TypeAgnosticSerialisation._type_desc(
+        Union{Int,Float64},
+        ctx,
+    )
 end
 
 @testset "module allowlist" begin
@@ -247,20 +255,26 @@ end
 
     ctx = SerdeContext((M,))
     # Nested submodule whose root is allowed resolves (BigFloat lives in Base.MPFR).
-    @test TaggedSerde._lookup_module("Base.MPFR", ctx) === Base.MPFR
-    @test TaggedSerde._lookup_module("Base.GMP", ctx) === Base.GMP
+    @test TypeAgnosticSerialisation._lookup_module("Base.MPFR", ctx) === Base.MPFR
+    @test TypeAgnosticSerialisation._lookup_module("Base.GMP", ctx) === Base.GMP
     # Root not allowed, or a non-existent submodule of an allowed root -> error.
-    @test_throws ErrorException TaggedSerde._lookup_module("NoSuchModule", ctx)
-    @test_throws ErrorException TaggedSerde._lookup_module("Base.NoSuchSubmodule", ctx)
+    @test_throws ErrorException TypeAgnosticSerialisation._lookup_module(
+        "NoSuchModule",
+        ctx,
+    )
+    @test_throws ErrorException TypeAgnosticSerialisation._lookup_module(
+        "Base.NoSuchSubmodule",
+        ctx,
+    )
 end
 
 @testset "resolve-type errors" begin
     ctx = SerdeContext((M,))
-    @test_throws ErrorException TaggedSerde._resolve_type(
+    @test_throws ErrorException TypeAgnosticSerialisation._resolve_type(
         Dict{String,Any}("name" => "Nope", "module" => "Base", "params" => Any[]),
         ctx,
     )
-    @test_throws ErrorException TaggedSerde._resolve_type(
+    @test_throws ErrorException TypeAgnosticSerialisation._resolve_type(
         Dict{String,Any}("name" => "println", "module" => "Base", "params" => Any[]),
         ctx,
     )
@@ -310,7 +324,7 @@ end
     ctx = SerdeContext((M,); opaque = (NoDefault,))
     tree = encode(NoDefault(5), ctx)          # placeholder only, ctor not called yet
     @test_throws ErrorException decode(tree, ctx)
-    @test_throws ErrorException TaggedSerde._construct_opaque(NoDefault)
+    @test_throws ErrorException TypeAgnosticSerialisation._construct_opaque(NoDefault)
 end
 
 @testset "file save/load, $label" for (label, loader) in (
@@ -345,8 +359,16 @@ end
     # Untagged payload with an abstract hint cannot be resolved.
     @test_throws ErrorException decode(Dict{String,Any}("w" => 1), M.AbstractShape, ctx)
     # A type with no encode/decode rule.
-    @test_throws ErrorException TaggedSerde._encode_plain(C_NULL, Ptr{Cvoid}, ctx)
-    @test_throws ErrorException TaggedSerde._decode_plain("x", Ptr{Cvoid}, ctx)
+    @test_throws ErrorException TypeAgnosticSerialisation._encode_plain(
+        C_NULL,
+        Ptr{Cvoid},
+        ctx,
+    )
+    @test_throws ErrorException TypeAgnosticSerialisation._decode_plain(
+        "x",
+        Ptr{Cvoid},
+        ctx,
+    )
     # #undef fields are unsupported.
     incomplete = ccall(:jl_new_struct_uninit, Any, (Any,), Rect{Any})
     @test_throws ErrorException encode(incomplete, ctx)
@@ -354,9 +376,12 @@ end
 
 @testset "internal reconstruction guards" begin
     # Field-count mismatch (e.g. a truncated/oversized payload).
-    @test_throws ErrorException TaggedSerde._newbuild(M.Rect{Int}, Any[1, 2, 3])
+    @test_throws ErrorException TypeAgnosticSerialisation._newbuild(
+        M.Rect{Int},
+        Any[1, 2, 3],
+    )
     # `new` cannot build a non-concrete type.
-    @test_throws ErrorException TaggedSerde._new_impl(M.AbstractShape, ())
+    @test_throws ErrorException TypeAgnosticSerialisation._new_impl(M.AbstractShape, ())
 end
 
 @testset "SerdeContext constructors" begin

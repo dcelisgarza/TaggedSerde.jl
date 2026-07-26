@@ -30,7 +30,7 @@ JuliaMinVersion: '1.10'
 License: MIT
 LicenseCopyrightHolders: Daniel Celis Garza
 MarkdownIndentation: 2
-PackageName: TaggedSerde
+PackageName: TypeAgnosticSerialisation
 PackageOwner: dcelisgarza
 PackageUUID: 711d1e8a-e0c5-5f25-919c-2a5a262959e5
 RunJuliaNightlyOnCI: false
