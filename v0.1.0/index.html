@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>TypeAgnosticSerialisation · TypeAgnosticSerialisation.jl</title><meta name="title" content="TypeAgnosticSerialisation · TypeAgnosticSerialisation.jl"/><meta property="og:title" content="TypeAgnosticSerialisation · TypeAgnosticSerialisation.jl"/><meta property="twitter:title" content="TypeAgnosticSerialisation · TypeAgnosticSerialisation.jl"/><meta name="description" content="Documentation for TypeAgnosticSerialisation.jl."/><meta property="og:description" content="Documentation for TypeAgnosticSerialisation.jl."/><meta property="twitter:description" content="Documentation for TypeAgnosticSerialisation.jl."/><meta property="og:url" content="https://dcelisgarza.github.io/TypeAgnosticSerialisation.jl/"/><meta property="twitter:url" content="https://dcelisgarza.github.io/TypeAgnosticSerialisation.jl/"/><link rel="canonical" href="https://dcelisgarza.github.io/TypeAgnosticSerialisation.jl/"/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href>TypeAgnosticSerialisation.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>TypeAgnosticSerialisation</a><ul class="internal"><li><a class="tocitem" href="#Installation"><span>Installation</span></a></li><li><a class="tocitem" href="#A-worked-example"><span>A worked example</span></a></li><li><a class="tocitem" href="#Reserved-keys-and-limitations"><span>Reserved keys and limitations</span></a></li><li><a class="tocitem" href="#Reference"><span>Reference</span></a></li></ul></li><li><a class="tocitem" href="95-reference/">Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>TypeAgnosticSerialisation</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>TypeAgnosticSerialisation</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/dcelisgarza/TypeAgnosticSerialisation.jl/blob/main/docs/src/index.md#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="TypeAgnosticSerialisation"><a class="docs-heading-anchor" href="#TypeAgnosticSerialisation">TypeAgnosticSerialisation</a><a id="TypeAgnosticSerialisation-1"></a><a class="docs-heading-anchor-permalink" href="#TypeAgnosticSerialisation" title="Permalink"></a></h1><p><strong>TypeAgnosticSerialisation</strong> serialises an arbitrary Julia value to JSON and reconstructs it later <em>without knowing its type up front</em>. The JSON carries enough type metadata — the full concrete type, including type parameters, recursively — to rebuild the exact concrete type tree. That is what lets a field declared <code>::AbstractShape</code> come back as the precise <code>Circle{Float64}</code> you put in.</p><p>Type resolution is gated by a <strong>module allowlist</strong>: a <code>__type__</code> tag may only name a type reachable from a module you explicitly trust. There is no <code>eval</code> of strings from the document.</p><h2 id="Installation"><a class="docs-heading-anchor" href="#Installation">Installation</a><a id="Installation-1"></a><a class="docs-heading-anchor-permalink" href="#Installation" title="Permalink"></a></h2><pre><code class="language-julia hljs">using Pkg
+Pkg.add(&quot;TypeAgnosticSerialisation&quot;)</code></pre><h2 id="A-worked-example"><a class="docs-heading-anchor" href="#A-worked-example">A worked example</a><a id="A-worked-example-1"></a><a class="docs-heading-anchor-permalink" href="#A-worked-example" title="Permalink"></a></h2><p>Everything below is a runnable, tested example. First, a small self-contained set of types. <code>Circle</code> is parametric with a validating inner constructor (radius must be positive); <code>Square</code> is a singleton; <code>Color</code> is an <code>@enum</code>; and <code>Handle</code> wraps a raw pointer — a stand-in for a live, non-data object. <code>Scene</code> ties them together, holding a heterogeneous <code>Vector{AbstractShape}</code>. All the names are exported so they can be used unqualified after <code>using .Shapes</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; using TypeAgnosticSerialisation
+
+julia&gt; module Shapes
+           export AbstractShape, Circle, Rect, Square, Color, red, green, blue, Scene, Handle, Doc
+           abstract type AbstractShape end
+           struct Circle{T} &lt;: AbstractShape
+               r::T
+               function Circle{T}(r::T) where {T}
+                   r &gt; 0 || error(&quot;Circle: radius must be positive&quot;)
+                   return new{T}(r)
+               end
+           end
+           Circle(r::T) where {T} = Circle{T}(r)
+           struct Rect{T} &lt;: AbstractShape
+               w::T
+               h::T
+           end
+           struct Square &lt;: AbstractShape end
+           @enum Color red green blue
+           struct Scene
+               shapes::Vector{AbstractShape}
+               bg::Color
+           end
+           struct Handle
+               ptr::Ptr{Cvoid}
+               Handle() = new(C_NULL)
+           end
+           struct Doc
+               title::String
+               handle::Handle
+           end
+       end;
+
+julia&gt; using .Shapes</code></pre><h3 id="Serialise-and-reconstruct"><a class="docs-heading-anchor" href="#Serialise-and-reconstruct">Serialise and reconstruct</a><a id="Serialise-and-reconstruct-1"></a><a class="docs-heading-anchor-permalink" href="#Serialise-and-reconstruct" title="Permalink"></a></h3><p><a href="95-reference/#TypeAgnosticSerialisation.to_json-Tuple{Any}"><code>to_json</code></a> writes a value out; <a href="95-reference/#TypeAgnosticSerialisation.from_json-Tuple{AbstractString}"><code>from_json</code></a> reads it back. The element type of <code>shapes</code> is the abstract <code>AbstractShape</code>, yet each element returns as the exact concrete type it was — that is the whole point:</p><pre><code class="language-julia-repl hljs">julia&gt; scene = Scene(AbstractShape[Circle(1.5), Rect(3, 4), Square()], green);
+
+julia&gt; json = to_json(scene; modules = (Shapes,));
+
+julia&gt; back = from_json(json; modules = (Shapes,));
+
+julia&gt; back.shapes[1] isa Circle{Float64}
+true
+
+julia&gt; back.shapes[2] isa Rect{Int}
+true
+
+julia&gt; (back.shapes[1].r, back.shapes[2].w, back.shapes[2].h)
+(1.5, 3, 4)
+
+julia&gt; back.bg === green
+true</code></pre><p>The <code>modules</code> allowlist is what makes reconstruction safe: only types reachable from the modules you pass (plus the always-present <code>Base</code>/<code>Core</code>) can be named by a tag. Hand the same document to a context that does not allow <code>Shapes</code>, and resolution is refused rather than resolving an unexpected type:</p><pre><code class="language-julia-repl hljs">julia&gt; try
+           from_json(json; modules = ())
+       catch
+           :refused
+       end
+:refused</code></pre><p>Under the hood, each value is wrapped in a self-describing <code>{&quot;__type__&quot;: …, &quot;__value__&quot;: …}</code> envelope carrying its full concrete type. For a single <code>Circle(1.5)</code> the JSON reads:</p><pre><code class="language-json hljs">{
+  &quot;__type__&quot;: {
+    &quot;module&quot;: &quot;Main.Shapes&quot;,
+    &quot;name&quot;: &quot;Circle&quot;,
+    &quot;params&quot;: [
+      { &quot;type&quot;: { &quot;module&quot;: &quot;Core&quot;, &quot;name&quot;: &quot;Float64&quot;, &quot;params&quot;: [] } }
+    ]
+  },
+  &quot;__value__&quot;: {
+    &quot;r&quot;: 1.5
+  }
+}</code></pre><h3 id="Validated-vs.-direct-loading"><a class="docs-heading-anchor" href="#Validated-vs.-direct-loading">Validated vs. direct loading</a><a id="Validated-vs.-direct-loading-1"></a><a class="docs-heading-anchor-permalink" href="#Validated-vs.-direct-loading" title="Permalink"></a></h3><p><code>from_json</code> is <strong>validated</strong>: every struct is rebuilt through its own constructor, so all inner-constructor / <code>@argcheck</code> invariants run and a tampered or inconsistent document is refused. <code>Circle</code>&#39;s constructor requires <code>r &gt; 0</code>; tamper the radius negative and the load fails:</p><pre><code class="language-julia-repl hljs">julia&gt; bad = replace(json, &quot;1.5&quot; =&gt; &quot;-1.5&quot;);
+
+julia&gt; try
+           from_json(bad; modules = (Shapes,))
+       catch
+           :refused
+       end
+:refused</code></pre><p><a href="95-reference/#TypeAgnosticSerialisation.from_json_direct-Tuple{AbstractString}"><code>from_json_direct</code></a> instead builds each struct field-by-field with Julia&#39;s own <code>new</code>, bypassing all constructors. It reconstructs <em>any</em> struct and is still type-safe (<code>new</code> type-checks every field), but runs <strong>no</strong> user validation — so the same tampered document loads a broken value. Use it for JSON you produced and trust, or for types whose constructor cannot be replayed from its fields:</p><pre><code class="language-julia-repl hljs">julia&gt; from_json_direct(bad; modules = (Shapes,)).shapes[1].r
+-1.5</code></pre><h3 id="Skipping-live,-non-data-fields-with-opaque"><a class="docs-heading-anchor" href="#Skipping-live,-non-data-fields-with-opaque">Skipping live, non-data fields with <code>opaque</code></a><a id="Skipping-live,-non-data-fields-with-opaque-1"></a><a class="docs-heading-anchor-permalink" href="#Skipping-live,-non-data-fields-with-opaque" title="Permalink"></a></h3><p>Some fields hold live, non-data objects — open files, solver models, raw pointers — that cannot (and should not) be serialised structurally. Encoding one that is <em>not</em> opted out fails loudly rather than emitting a broken artifact:</p><pre><code class="language-julia-repl hljs">julia&gt; doc = Doc(&quot;annual report&quot;, Handle());
+
+julia&gt; try
+           to_json(doc; modules = (Shapes,))
+       catch
+           :failed_loudly
+       end
+:failed_loudly</code></pre><p>Mark such a type <code>opaque</code> and it is replaced by a placeholder on encode and rebuilt with its no-argument constructor <code>T()</code> on decode. The surrounding data round-trips untouched; the live object comes back fresh:</p><pre><code class="language-julia-repl hljs">julia&gt; js = to_json(doc; modules = (Shapes,), opaque = (Handle,));
+
+julia&gt; back = from_json(js; modules = (Shapes,), opaque = (Handle,));
+
+julia&gt; back.title
+&quot;annual report&quot;
+
+julia&gt; back.handle.ptr == C_NULL
+true</code></pre><h3 id="The-dependency-free-core:-encode-/-decode"><a class="docs-heading-anchor" href="#The-dependency-free-core:-encode-/-decode">The dependency-free core: <code>encode</code> / <code>decode</code></a><a id="The-dependency-free-core:-encode-/-decode-1"></a><a class="docs-heading-anchor-permalink" href="#The-dependency-free-core:-encode-/-decode" title="Permalink"></a></h3><p><code>to_json</code> is just <a href="95-reference/#TypeAgnosticSerialisation.encode-Tuple{Any, SerdeContext}"><code>encode</code></a> followed by <code>JSON.json</code>. The <code>encode</code>/<code>decode</code> core has no dependencies at all — it lowers a value to a <strong>plain tree</strong> of <code>Dict{String,Any}</code>, <code>Vector{Any}</code> and scalars, which any text layer can render:</p><pre><code class="language-julia-repl hljs">julia&gt; ctx = SerdeContext((Shapes,));
+
+julia&gt; tree = encode(Circle(2.0), ctx);
+
+julia&gt; tree isa Dict{String,Any}
+true
+
+julia&gt; decode(tree, ctx).r
+2.0</code></pre><h3 id="A-different-text-layer-(TOML)"><a class="docs-heading-anchor" href="#A-different-text-layer-(TOML)">A different text layer (TOML)</a><a id="A-different-text-layer-(TOML)-1"></a><a class="docs-heading-anchor-permalink" href="#A-different-text-layer-(TOML)" title="Permalink"></a></h3><p>Because the core is text-agnostic, you can serialise the plain tree through any format, not just JSON. When the type is known at the call site (a concrete <code>hint</code>), <code>encode</code> emits a bare structural payload with no envelope — for <code>Rect</code> that is a plain table, which round- trips cleanly through TOML:</p><pre><code class="language-julia-repl hljs">julia&gt; import TOML
+
+julia&gt; payload = encode(Rect(3, 4), Rect{Int}, ctx);   # concrete hint -&gt; no envelope
+
+julia&gt; io = IOBuffer(); TOML.print(io, payload); s = String(take!(io));
+
+julia&gt; rt = decode(TOML.parse(s), Rect{Int}, ctx);
+
+julia&gt; (rt.w, rt.h)
+(3, 4)</code></pre><h2 id="Reserved-keys-and-limitations"><a class="docs-heading-anchor" href="#Reserved-keys-and-limitations">Reserved keys and limitations</a><a id="Reserved-keys-and-limitations-1"></a><a class="docs-heading-anchor-permalink" href="#Reserved-keys-and-limitations" title="Permalink"></a></h2><p>The envelope reserves a handful of JSON keys: <code>&quot;__type__&quot;</code>, <code>&quot;__value__&quot;</code> (the tagged envelope); <code>&quot;type&quot;</code>/<code>&quot;value&quot;</code> (type-parameter wrappers); <code>&quot;size&quot;</code>/<code>&quot;data&quot;</code> (arrays); <code>&quot;pairs&quot;</code> (dicts); <code>&quot;names&quot;</code>/<code>&quot;values&quot;</code> (named tuples); and <code>&quot;__opaque__&quot;</code> (opaque placeholders). A struct field literally named <code>__type__</code> would collide — a documented limitation. <code>#undef</code> fields are unsupported and are reported rather than silently dropped.</p><h2 id="Reference"><a class="docs-heading-anchor" href="#Reference">Reference</a><a id="Reference-1"></a><a class="docs-heading-anchor-permalink" href="#Reference" title="Permalink"></a></h2><p>Every exported function — <a href="95-reference/#TypeAgnosticSerialisation.to_json-Tuple{Any}"><code>to_json</code></a>, <a href="95-reference/#TypeAgnosticSerialisation.from_json-Tuple{AbstractString}"><code>from_json</code></a>, <a href="95-reference/#TypeAgnosticSerialisation.from_json_direct-Tuple{AbstractString}"><code>from_json_direct</code></a>, <a href="95-reference/#TypeAgnosticSerialisation.encode-Tuple{Any, SerdeContext}"><code>encode</code></a>, <a href="95-reference/#TypeAgnosticSerialisation.decode-Tuple{Any, SerdeContext}"><code>decode</code></a> and <a href="95-reference/#TypeAgnosticSerialisation.SerdeContext"><code>SerdeContext</code></a> — is documented in full in the <a href="95-reference/#reference">Reference</a> section of the online documentation.</p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="95-reference/">Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Wednesday 29 July 2026 08:59">Wednesday 29 July 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
